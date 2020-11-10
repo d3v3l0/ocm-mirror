@@ -7,7 +7,7 @@
  * - logs request summary to logs.openchargemap.org for debug purposes (rejections, API abuse etc)
  * */
 
-const enableAPIKeyRules = true;
+const enableAPIKeyRules = false;
 
 addEventListener('fetch', event => {
 

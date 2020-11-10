@@ -1,0 +1,35 @@
+version: '3'
+
+# TODO: add systemctl-script for launch of docker containers
+# - TODO: before launching Docker containers, stop any existing Docker container?
+
+# TODO: force-pull both containers
+
+services:
+  api-worker:
+    # TODO: remove build?
+    build:
+      context: ./
+      dockerfile: ./API/OCM.Net/OCM.API.Worker/Dockerfile
+    restart: unless-stopped
+    ports:
+      - 8080:80
+    depends_on:
+      - mongo-db
+
+  mongo-db:
+    # - https://hub.docker.com/_/mongo  
+    # - https://github.com/docker-library/mongo 
+    # - https://docs.mongodb.com/manual/reference/program/mongod/
+    # TODO: remove build?
+    image: mongo:4.4.1-bionic
+    restart: unless-stopped
+    volumes:
+      - mongodb-data:/data/db/
+    ports:
+      - 27017:27017
+
+
+volumes:
+  mongodb-data:
+    driver: local

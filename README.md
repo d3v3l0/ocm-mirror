@@ -1,3 +1,44 @@
+# Self-hosted Open Charge Map (OCM) Mirror without API rate limitations...
+..., forked from the official [**openchargemap/ocm-system**](https://github.com/openchargemap/ocm-system/) project.
+
+**Background**: As per [Issue `#161/api-keys-are-now-required`](https://community.openchargemap.org/t/api-keys-are-now-required/161) the **official** API endpoint got **rate limited**.
+
+This fork **mirrors** official OCM API `https://api-01.openchargemap.io/v3/{poi, ...}`.
+
+It is deployable in the Cloud or in a local developer's environment via `docker-compose`.
+
+After start, the [OCM.API.Worker](./API/OCM.Net/OCM.API.Worker/) will regularly synchronize fresh POI data from the [official master API - https://api-01.openchargemap.io/v3/...](https://api-01.openchargemap.io/v3/) (**every** `300 seconds`).
+
+
+Courtesy by [@LHaferkamp](https://github.com/LHaferkamp).
+
+For more information see [CS Reply Confluence](https://confluence.comsysto.com/display/DEEP/Self-hosted+OpenChargeMap%28OCM%29+Mirror).
+
+
+## Development: local installation on developers laptop
+Prerequisites: Docker is installed an running.
+
+* Clone this project:
+```shell
+git clone https://github.com/comsysto/ocm-mirror
+```
+
+* Build and launch the required Docker containers with `docker-compose`:
+```shell
+cd ocm-mirror
+
+docker-compose up
+
+```
+
+
+----
+----
+----
+
+
+# Official docs...
+
 Open Charge Map (OCM)
 ==========
 
