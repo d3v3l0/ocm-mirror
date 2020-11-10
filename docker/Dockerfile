@@ -26,15 +26,7 @@ RUN apt-get update && apt-get install -y \
     moreutils \
     && rm -rf /var/lib/apt/lists/*
 
-# TODO: remove
-RUN echo '#!/usr/bin/env bash\n\
-\n\
-set -Eeuo pipefail\n\
-\n\
-exec dotnet OCM.API.Worker.dll | ts "[%Y-%m-%dT%H:%M:%.SZ]" \n\
-'\
-    >> /app/start-worker.sh \
-    && chmod +x /app/start-worker.sh
+ADD start-worker.sh .
 
 
 ENTRYPOINT exec /app/start-worker.sh
