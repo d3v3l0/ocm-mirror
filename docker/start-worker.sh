@@ -4,8 +4,11 @@ set -Eeuo pipefail
 
 if [[ $FORCE_UPGRADE_DATA == 'true' || $FORCE_UPGRADE_DATA == '1' ]]; then
   # Empty MongoDB
-  # TODO: Delete all collections
-  
+  # ******************************************
+  # TODO: purge MongoDB
+  # TODO: Delete all collections from the MongoDB
+  # ******************************************
+
   # ----
   # Download MongoDB dump from official OCM repo
   # https://github.com/openchargemap/ocm-data
@@ -21,16 +24,41 @@ if [[ $FORCE_UPGRADE_DATA == 'true' || $FORCE_UPGRADE_DATA == '1' ]]; then
   # ----
 
   # TODO: remove
-  #mongoexport --collection=reference --db=ocm_mirror --out=reference.json
-  #mongoexport --collection=poi --db=ocm_mirror --out=poi.json
+  # mongoexport --collection=reference --db=ocm_mirror --out=reference.json
+  # mongoexport --collection=poi --db=ocm_mirror --out=poi.json
 
   # TODO: Install "aria2"
-  aria2c -x10 -k2M https://github.com/openchargemap/ocm-data/raw/master/poi.json.gz -d /tmp/
-  aria2c -x1 https://github.com/openchargemap/ocm-data/raw/master/reference.json.gz -d /tmp/
   
-  # TODO: Import downloaded data into MongoDB
-  gunzip /tmp/reference.json.gz | mongoimport --collection=reference --db=ocm_mirror
-  gunzip /tmp/poi.json.gz | mongoimport --collection=poi --db=ocm_mirror
+  # Downloading fresh official MongoDB dump shnapshots from GitHub repo `openchargemap/ocm-data`:
+  #  1) `poi.json.gz`
+  aria2c --max-connection-per-server=16 \
+    --min-split-size=2M \
+    --continue=true \
+    --allow-overwrite=true \
+    --auto-file-renaming=false \
+    https://github.com/openchargemap/ocm-data/raw/master/poi.json.gz \
+    -d /tmp/
+
+  # 2) `reference.json.gz`
+  aria2c --max-connection-per-server=1 \
+    --min-split-size=2M \
+    --continue=true \
+    --allow-overwrite=true \
+    --auto-file-renaming=false \
+    https://github.com/openchargemap/ocm-data/raw/master/reference.json.gz \
+    -d /tmp/
+
+  # Importing downloaded data into MongoDB
+  mongoimport \
+    --collection=reference \
+    --db=ocm_mirror \
+    < <(gunzip /tmp/reference.json.gz)
+
+  mongoimport \
+    --collection=poi \
+    --db=ocm_mirror \
+    < <(gunzip /tmp/poi.json.gz)
 fi
 
+# Starting Worker daemon
 exec dotnet OCM.API.Worker.dll | ts '[%Y-%m-%dT%H:%M:%.SZ]'
